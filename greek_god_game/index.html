@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Grid Game</title>
+  <style>
+    html,body { height:100%; margin:0; background:#111; color:#ddd; font-family:Arial, sans-serif; }
+    #game-container { width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; }
+    #game-banner { display:block; height:auto; }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <img id="game-banner" src="graphics/banner.png" alt="Wrath of the Gods" />
+    <div id="game-root"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.min.js"></script>
+  <script src="src/gridScene.js"></script>
+  <script src="src/main.js"></script>
+</body>
+</html>
