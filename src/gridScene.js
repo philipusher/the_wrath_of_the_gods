@@ -573,9 +573,14 @@ class GridScene extends Phaser.Scene {
     this.uiGroup = this.add.group();
     const uiBarWidth = this.panelWidth - 32;
     const segmentCount = 5;
+    const sidebarTitle = this.add.text(leftInnerX, leftInnerY, 'The Wrath of The Gods by Alistair Usher', { font: '12px monospace', fill: '#ffffff', wordWrap: { width: uiBarWidth } })
+      .setScrollFactor(0)
+      .setDepth(53);
+    this.uiGroup.add(sidebarTitle);
+    const barsStartY = leftInnerY + sidebarTitle.height + 6;
     for (let i = 0; i < this.gods.length; i++) {
       const gx = leftInnerX;
-      const gy = leftInnerY + i * 60;
+      const gy = barsStartY + i * 60;
       const gw = uiBarWidth;
       const gh = 45;
       const bg = this.add.rectangle(gx + gw / 2, gy + gh / 2, gw, gh, 0x222222).setOrigin(0.5).setScrollFactor(0).setDepth(50);
@@ -614,12 +619,16 @@ class GridScene extends Phaser.Scene {
       if (icon) this.uiGroup.add(icon);
     }
 
-    const instructionsY = leftInnerY + this.gods.length * 60 + 8;
+    const instructionsY = barsStartY + this.gods.length * 60 + 8;
     const instructions = 'Instructions:\nGive offerings to the gods.\nAvoid the minotaur.';
     this.instructionsText = this.add.text(leftInnerX, instructionsY, instructions, { font: '12px monospace', fill: '#ffffff', wordWrap: { width: uiBarWidth } })
       .setScrollFactor(0)
       .setDepth(53);
 
+    const controlsY = instructionsY + this.instructionsText.height + 6;
+    this.controlsText = this.add.text(leftInnerX, controlsY, 'Controls: Arrow keys / WASD', { font: '12px monospace', fill: '#ffffff', wordWrap: { width: uiBarWidth } })
+      .setScrollFactor(0)
+      .setDepth(53);
 
     // Score
     this.score = 0;
@@ -665,9 +674,6 @@ class GridScene extends Phaser.Scene {
     const os = this.sys && this.sys.game && this.sys.game.device && this.sys.game.device.os;
     const isMobile = os && (os.android || os.iOS || os.iPad || os.iPhone || os.windowsPhone);
     if (isMobile) this.createDPad();
-
-    // Small instructions and debug text
-    this.debugText = this.add.text(12, 12, 'Use arrow keys or WASD to move.', { font: '14px monospace', fill: '#ffffff' }).setScrollFactor(0).setDepth(20);
 
     // Start background music
     if (!this.sound.get('bgMusic')) {
@@ -1230,11 +1236,6 @@ class GridScene extends Phaser.Scene {
   }
 
   update(time, delta) {
-    // Update debug text with player grid position
-    if (this.debugText) {
-      this.debugText.setText(`Use arrow keys or WASD to move. Player cell: ${this.playerGridCol}, ${this.playerGridRow}`);
-    }
-
     // marker follows via tween/position, ensure synced
     if (this.player && this.playerMarker) {
       this.playerMarker.x = this.player.x;
