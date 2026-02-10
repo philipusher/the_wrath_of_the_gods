@@ -206,7 +206,7 @@ class GridScene extends Phaser.Scene {
     this.entranceCells = new Set();
     this.temples = [];
     const templeColors = [0xff4444, 0x4466ff, 0xffdd44];
-    const templeNames = ['Zeus', 'Hermes', 'Poseidon'];
+    const templeNames = ['Hermes', 'Poseidon', 'Zeus'];
     const templeImgKeys = ['red_temple', 'blue_temple', 'yellow_temple'];
     const templeCellsSize = 4;
 
@@ -542,9 +542,9 @@ class GridScene extends Phaser.Scene {
 
     // gods state
     this.gods = [
-      { name: 'Zeus', color: 0xffdd44, anger: 0, rate: 2.5, iconKey: 'zeus_icon' },
       { name: 'Hermes', color: 0xff4444, anger: 0, rate: 2.5, iconKey: 'hermes_icon' },
-      { name: 'Poseidon', color: 0x4466ff, anger: 0, rate: 2.5, iconKey: 'poseidon_icon' }
+      { name: 'Poseidon', color: 0x4466ff, anger: 0, rate: 2.5, iconKey: 'poseidon_icon' },
+      { name: 'Zeus', color: 0xffdd44, anger: 0, rate: 2.5, iconKey: 'zeus_icon' }
     ];
     this.delivered = [0, 0, 0];
 
@@ -884,9 +884,9 @@ class GridScene extends Phaser.Scene {
     if (!win && angryGodIndex !== undefined && angryGodIndex !== null) {
       // God-specific loss messages
       const godMessages = [
-        ['IS DISPLEASED!', 'DOUBTS YOUR DEVOTION!', 'DEMANDS TRIBUTE!', 'GROWS IMPATIENT!'],
         ['IS DISPLEASED!', 'DOUBTS YOUR DEVOTION!', 'QUESTIONS YOUR FAITH!', 'FEELS NEGLECTED!'],
-        ['IS DISPLEASED!', 'DOUBTS YOUR DEVOTION!', 'RAGES AGAINST YOU!', 'LOSES PATIENCE!']
+        ['IS DISPLEASED!', 'DOUBTS YOUR DEVOTION!', 'RAGES AGAINST YOU!', 'LOSES PATIENCE!'],
+        ['IS DISPLEASED!', 'DOUBTS YOUR DEVOTION!', 'DEMANDS TRIBUTE!', 'GROWS IMPATIENT!']
       ];
       const godName = this.gods[angryGodIndex].name.toUpperCase();
       const messages = godMessages[angryGodIndex];
