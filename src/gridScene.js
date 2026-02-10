@@ -662,6 +662,10 @@ class GridScene extends Phaser.Scene {
       if (dx !== 0 || dy !== 0) this.tryMove(dx, dy);
     });
 
+    const os = this.sys && this.sys.game && this.sys.game.device && this.sys.game.device.os;
+    const isMobile = os && (os.android || os.iOS || os.iPad || os.iPhone || os.windowsPhone);
+    if (isMobile) this.createDPad();
+
     // Small instructions and debug text
     this.debugText = this.add.text(12, 12, 'Use arrow keys or WASD to move.', { font: '14px monospace', fill: '#ffffff' }).setScrollFactor(0).setDepth(20);
 
@@ -1331,6 +1335,34 @@ class GridScene extends Phaser.Scene {
     }
     return path;
   }
-}
 
+  createDPad() {
+    const size = 24;
+    const spacing = 8;
+    const offset = size * 2 + spacing;
+    const centerX = Math.max(72, this.panelPadding + 60);
+    const centerY = this.scale.height - 120;
+    const style = { font: '16px monospace', fill: '#ffffff' };
+
+    const makeButton = (x, y, dx, dy, label) => {
+      const btn = this.add.circle(x, y, size, 0x000000, 0.35)
+        .setStrokeStyle(2, 0xffffff, 0.8)
+        .setScrollFactor(0)
+        .setDepth(80)
+        .setInteractive({ useHandCursor: false });
+      const text = this.add.text(x, y, label, style).setOrigin(0.5).setScrollFactor(0).setDepth(81);
+      btn.on('pointerdown', () => {
+        if (!this.isMoving) this.tryMove(dx, dy);
+      });
+      return [btn, text];
+    };
+
+    this.dpadItems = [];
+    this.dpadItems.push(...makeButton(centerX, centerY - offset, 0, -1, '?'));
+    this.dpadItems.push(...makeButton(centerX - offset, centerY, -1, 0, '?'));
+    this.dpadItems.push(...makeButton(centerX + offset, centerY, 1, 0, '?'));
+    this.dpadItems.push(...makeButton(centerX, centerY + offset, 0, 1, '?'));
+  }
+
+}
 window.GridScene = GridScene;
