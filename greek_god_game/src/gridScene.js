@@ -11,6 +11,9 @@ class GridScene extends Phaser.Scene {
     this.load.image('bg_sand', 'graphics/bg_sand.png');
     this.load.image('side_vert', 'graphics/side_vert.png');
     this.load.image('side_horiz', 'graphics/side_horiz.png');
+    this.load.image('zeus_icon', 'graphics/zeus.png');
+    this.load.image('hermes_icon', 'graphics/hermes.png');
+    this.load.image('poseidon_icon', 'graphics/poseidon.png');
     // temple images
     this.load.image('red_temple', 'graphics/red_temple.png');
     this.load.image('blue_temple', 'graphics/blue_temple.png');
@@ -333,6 +336,7 @@ class GridScene extends Phaser.Scene {
             if (rr < 0 || rr >= this.rows || cc < 0 || cc >= this.cols) continue;
             if (this.templeOccupied.has(`${cc},${rr}`)) return false;
           }
+          if (!ok) break;
         }
         for (let rr = r0; rr < r0 + templeCellsSize; rr++) {
           for (let cc = c0; cc < c0 + templeCellsSize; cc++) {
@@ -538,9 +542,9 @@ class GridScene extends Phaser.Scene {
 
     // gods state
     this.gods = [
-      { name: 'Zeus', color: 0xff4444, anger: 0, rate: 2.5 },
-      { name: 'Hermes', color: 0x4466ff, anger: 0, rate: 2.5 },
-      { name: 'Poseidon', color: 0xffdd44, anger: 0, rate: 2.5 }
+      { name: 'Zeus', color: 0xffdd44, anger: 0, rate: 2.5, iconKey: 'zeus_icon' },
+      { name: 'Hermes', color: 0xff4444, anger: 0, rate: 2.5, iconKey: 'hermes_icon' },
+      { name: 'Poseidon', color: 0x4466ff, anger: 0, rate: 2.5, iconKey: 'poseidon_icon' }
     ];
     this.delivered = [0, 0, 0];
 
@@ -590,11 +594,32 @@ class GridScene extends Phaser.Scene {
         const segBar = this.add.rectangle(segX, barY, 0, segmentHeight, this.gods[i].color).setOrigin(0, 0.5).setScrollFactor(0).setDepth(52);
         segments.push({ bg: segBg, bar: segBar, width: segmentWidth });
       }
-      
-      const name = this.add.text(gx + 8, gy + 8, `${this.gods[i].name}`, { font: '14px monospace', fill: '#ffffff' }).setScrollFactor(0).setDepth(53);
+
+      const iconSize = 18;
+      let nameX = gx + 8;
+      const iconKey = this.gods[i].iconKey;
+      let icon;
+      if (iconKey && this.textures.exists(iconKey)) {
+        icon = this.add.image(gx + 8 + iconSize / 2, gy + 8 + iconSize / 2, iconKey)
+          .setDisplaySize(iconSize, iconSize)
+          .setOrigin(0.5)
+          .setScrollFactor(0)
+          .setDepth(53);
+        nameX += iconSize + 6;
+      }
+
+      const name = this.add.text(nameX, gy + 8, `${this.gods[i].name}`, { font: '14px monospace', fill: '#ffffff' }).setScrollFactor(0).setDepth(53);
       this.gods[i].ui = { segments, totalBarWidth };
       this.uiGroup.addMultiple([bg, name, ...segments.map(s => s.bg), ...segments.map(s => s.bar)]);
+      if (icon) this.uiGroup.add(icon);
     }
+
+    const instructionsY = leftInnerY + this.gods.length * 60 + 8;
+    const instructions = 'Instructions:\nGive offerings to the gods.\nAvoid the minotaur.';
+    this.instructionsText = this.add.text(leftInnerX, instructionsY, instructions, { font: '12px monospace', fill: '#ffffff', wordWrap: { width: uiBarWidth } })
+      .setScrollFactor(0)
+      .setDepth(53);
+
 
     // Score
     this.score = 0;
@@ -879,7 +904,20 @@ class GridScene extends Phaser.Scene {
     this.add.text(cx, cy - 50, msg, { font: '32px monospace', fill: '#ffffff' }).setOrigin(0.5).setDepth(201);
     
     if (subMsg) {
-      this.add.text(cx, cy - 10, subMsg, { font: '18px monospace', fill: subMsgColor }).setOrigin(0.5).setDepth(201);
+      const subText = this.add.text(cx, cy - 10, subMsg, { font: '18px monospace', fill: subMsgColor }).setOrigin(0.5).setDepth(201);
+      if (angryGodIndex !== undefined && angryGodIndex !== null) {
+        const iconKey = this.gods[angryGodIndex] && this.gods[angryGodIndex].iconKey;
+        if (iconKey && this.textures.exists(iconKey)) {
+          const iconSize = 66;
+          const offset = (iconSize + 6) / 2;
+          subText.x = cx + offset;
+          const leftEdge = subText.x - subText.width / 2;
+          this.add.image(leftEdge - iconSize / 2 - 6, cy - 10, iconKey)
+            .setDisplaySize(iconSize, iconSize)
+            .setOrigin(0.5)
+            .setDepth(201);
+        }
+      }
     }
 
     // stop timers
@@ -1197,6 +1235,14 @@ class GridScene extends Phaser.Scene {
     if (this.player && this.playerMarker) {
       this.playerMarker.x = this.player.x;
       this.playerMarker.y = this.player.y;
+    }
+
+    if (!this._ended && this.gods) {
+      const angryIndex = this.gods.findIndex(god => god.anger >= 100);
+      if (angryIndex !== -1) {
+        this.endGame(false, angryIndex);
+        return;
+      }
     }
 
     // Minotaur path-following logic: compute path to current target waypoint using simple BFS
