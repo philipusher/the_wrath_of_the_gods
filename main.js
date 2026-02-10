@@ -32,6 +32,8 @@ const requestMobileFullscreen = async () => {
   const os = game && game.device && game.device.os;
   const isMobile = os && (os.android || os.iOS || os.iPad || os.iPhone || os.windowsPhone);
   if (!isMobile) return;
+  const banner = document.getElementById('game-banner');
+  if (banner) banner.style.display = 'none';
   const container = document.getElementById('game-root');
   if (container && container.requestFullscreen && !document.fullscreenElement) {
     try {
