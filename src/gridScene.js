@@ -1337,10 +1337,10 @@ class GridScene extends Phaser.Scene {
   }
 
   createDPad() {
-    const size = 28;
+    const size = 32;
     const spacing = 8;
     const offset = size * 2 + spacing;
-    const centerX = this.scale.width - Math.max(72, this.panelPadding + 60);
+    const centerX = this.scale.width - Math.max(72, this.panelPadding + 60) - 40;
     const centerY = this.scale.height - 120;
     const style = { font: '16px monospace', fill: '#ffffff' };
 
